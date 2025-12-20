@@ -1,6 +1,0 @@
-langchain_community==0.2.16
-langchain_chroma==0.1.4
-langchain==0.2.16
-ollama==0.3.3
-streamlit==1.38.0
-pypdf==4.3.1

@@ -15,7 +15,7 @@ from ..core.ledger import RunLedger
 app = FastAPI(
     title="NEXUS RAG API",
     description="Headless RAG API for document intelligence",
-    version="1.0.0"
+    version="1.1.0"
 )
 
 # CORS middleware
@@ -212,7 +212,7 @@ async def root():
     """Root endpoint"""
     return {
         "service": "NEXUS RAG API",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "status": "operational",
         "endpoints": {
             "health": "/health",

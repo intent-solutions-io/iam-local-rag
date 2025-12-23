@@ -19,8 +19,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
-      - name: Run tests
-        run: pytest
+      - name: Run unit tests (router, policy, ledger)
+        run: |
+          # Run tests that don't require Ollama
+          pytest 03-Tests/test_router.py 03-Tests/test_policy.py 03-Tests/test_ledger.py -v
 
   integration:
     # Optional heavier test - won't block merges
@@ -46,6 +48,15 @@ jobs:
           done
       - name: Pull model
         run: ollama pull llama3
+      - name: Run integration and API tests
+        env:
+          OLLAMA_MODEL: llama3
+          DOCUMENTS_DIR: ./documents
+          CHROMA_DB_PATH: ./chroma_db_ci
+          LEDGER_DB_PATH: ./nexus_ledger_ci.db
+        run: |
+          # Run integration and API tests with Ollama
+          pytest 03-Tests/test_integration.py 03-Tests/test_api.py -v
       - name: Smoke the pipeline (no UI)
         env:
           OLLAMA_MODEL: llama3

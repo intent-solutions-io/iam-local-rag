@@ -1,6 +1,31 @@
-langchain_community==0.2.16
-langchain_chroma==0.1.4
-langchain==0.2.16
-ollama==0.3.3
-streamlit==1.38.0
-pypdf==4.3.1
+# Core RAG dependencies
+streamlit>=1.28.0
+langchain>=0.2.0
+langchain-community>=0.2.0
+langchain-core>=0.2.0
+
+# Document loaders
+pypdf>=3.16.0
+
+# Vector store
+chromadb>=0.4.15
+
+# Local LLM
+ollama>=0.1.0
+
+# Performance and utilities
+psutil>=5.9.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Cloud LLM providers (optional for hybrid mode)
+anthropic>=0.25.0
+openai>=1.0.0
+google-cloud-aiplatform>=1.38.0
+
+# API framework (for Phase 3)
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.0.0

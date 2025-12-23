@@ -8,15 +8,20 @@
 
 ## Documents by Category
 
-### DR - Documentation & Reference (3 documents)
+### DR - Documentation & Reference (4 documents)
 
 - `001-DR-STND-directory-standards.md` — Document Filing System Standard v4.2
 - `002-DR-GUID-agent-instructions.md` — Beads (bd) agent workflow guide
 - `003-DR-REFF-readme.md` — Project README reference
+- `005-DR-GUID-nexus-hybrid-upgrade-summary.md` — NEXUS hybrid cloud upgrade guide
 
 ### RA - Reports & Analysis (1 document)
 
 - `004-RA-AUDT-directory-cleanup-compliance.md` — Directory cleanup compliance audit report
+
+### AA - After Action & Review (1 document)
+
+- `006-AA-REPT-nexus-hybrid-cloud-team-upgrade.md` — Comprehensive AAR for NEXUS upgrade
 
 ---
 
@@ -26,6 +31,8 @@
 - `002-DR-GUID-agent-instructions.md`
 - `003-DR-REFF-readme.md`
 - `004-RA-AUDT-directory-cleanup-compliance.md`
+- `005-DR-GUID-nexus-hybrid-upgrade-summary.md`
+- `006-AA-REPT-nexus-hybrid-cloud-team-upgrade.md`
 
 ---
 
@@ -38,7 +45,7 @@
 - **short-description** = 1-4 words, kebab-case
 - **ext** = File extension
 
-**Next Available Sequence:** `005`
+**Next Available Sequence:** `007`
 
 ---
 

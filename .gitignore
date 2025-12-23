@@ -8,9 +8,19 @@ __pycache__/
 
 # Virtual Environment
 venv/
+env/
+ENV/
 
-# Ollama/ChromaDB
+# Environment variables (secrets)
+.env
+.env.local
+.env.*.local
+
+# Ollama/ChromaDB/Caches
 chroma_db/
+chroma_db_optimized/
+rag_cache/
+index_metadata.json
 
 # Streamlit
 .streamlit/
@@ -19,3 +29,18 @@ chroma_db/
 *.log
 *.tmp
 .DS_Store
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documents (local data - don't commit user data)
+documents/*
+!documents/.gitkeep

@@ -145,12 +145,12 @@ if rag_chain:
     with st.sidebar:
         st.markdown("### 🧠 NEXUS Control Panel")
         if st.button("🔄 Reset Knowledge Base", help="Clear conversation and re-index all documents"):
-        st.session_state.messages = []
-        # Delete ChromaDB to force re-indexing
-        if os.path.exists(CHROMA_DB_PATH):
-            import shutil
-            shutil.rmtree(CHROMA_DB_PATH)
-        st.cache_resource.clear()  # Clear NEXUS cache
-        st.rerun()  # Reinitialize NEXUS pipeline
+            st.session_state.messages = []
+            # Delete ChromaDB to force re-indexing
+            if os.path.exists(CHROMA_DB_PATH):
+                import shutil
+                shutil.rmtree(CHROMA_DB_PATH)
+            st.cache_resource.clear()  # Clear NEXUS cache
+            st.rerun()  # Reinitialize NEXUS pipeline
 else:
     st.error("🧠 NEXUS requires documents to analyze. Add files to 'documents/' folder and restart.")

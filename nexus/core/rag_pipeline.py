@@ -21,6 +21,7 @@ from .models import (
 from .providers.base import LLMProvider, EmbeddingProvider
 from .router import ProviderRouter
 from .policy import PolicyRedactor
+from .ledger import RunLedger
 
 
 class RAGPipeline:
@@ -56,6 +57,9 @@ class RAGPipeline:
 
         # Initialize policy redactor for hybrid safety
         self.policy = PolicyRedactor()
+
+        # Initialize run ledger for audit trail
+        self.ledger = RunLedger()
 
         # Initialize vector store path for this workspace
         self.chroma_path = f"{Config.CHROMA_DB_PATH}/{workspace_id}"
@@ -141,7 +145,7 @@ class RAGPipeline:
 
         processing_time = (time.time() - start_time) * 1000
 
-        return IndexResult(
+        result = IndexResult(
             workspace_id=self.workspace_id,
             files_processed=len(request.paths),
             files_skipped=0,
@@ -149,6 +153,12 @@ class RAGPipeline:
             processing_time_ms=processing_time,
             document_sources=sources
         )
+
+        # Record index run to ledger
+        embed_provider_name = type(self.embed_provider).__name__
+        self.ledger.record_index_run(result, embed_provider_name)
+
+        return result
 
     def query(self, request: QueryRequest) -> QueryResponse:
         """
@@ -216,7 +226,8 @@ class RAGPipeline:
 
         latency = (time.time() - start_time) * 1000
 
-        return QueryResponse(
+        response = QueryResponse(
+            question=request.question,
             answer=answer,
             citations=citations,
             workspace_id=self.workspace_id,
@@ -226,6 +237,11 @@ class RAGPipeline:
             run_id=run_id,
             timestamp=datetime.now()
         )
+
+        # Record query run to ledger (with excerpt hashes for audit)
+        self.ledger.record_query_run(response, excerpt_hashes)
+
+        return response
 
     def _hash_file(self, file_path: str) -> str:
         """Generate hash of file contents"""

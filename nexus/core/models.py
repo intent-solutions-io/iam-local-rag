@@ -44,6 +44,7 @@ class QueryRequest(BaseModel):
 
 class QueryResponse(BaseModel):
     """Response from a knowledge base query"""
+    question: str
     answer: str
     citations: List[Citation]
     workspace_id: str

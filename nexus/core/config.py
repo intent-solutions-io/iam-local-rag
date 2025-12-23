@@ -68,6 +68,7 @@ class Config:
 
     # --- Vector Store ---
     CHROMA_DB_PATH: str = os.getenv("CHROMA_DB_PATH", "./chroma_db_optimized")
+    LEDGER_DB_PATH: str = os.getenv("LEDGER_DB_PATH", "./nexus_ledger.db")
     CACHE_DIR: str = os.getenv("CACHE_DIR", "./rag_cache")
     INDEX_METADATA_PATH: str = os.getenv("INDEX_METADATA_PATH", "./index_metadata.json")
 

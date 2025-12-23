@@ -19,7 +19,8 @@ from .models import (
     IndexRequest, IndexResult, DocumentSource
 )
 from .providers.base import LLMProvider, EmbeddingProvider
-from .providers.ollama_provider import OllamaLLMProvider, OllamaEmbeddingProvider
+from .router import ProviderRouter
+from .policy import PolicyRedactor
 
 
 class RAGPipeline:
@@ -38,13 +39,23 @@ class RAGPipeline:
         Initialize RAG pipeline with providers.
 
         Args:
-            llm_provider: LLM provider (defaults to Ollama)
-            embed_provider: Embedding provider (defaults to Ollama)
+            llm_provider: LLM provider (defaults to router selection)
+            embed_provider: Embedding provider (defaults to router selection)
             workspace_id: Workspace identifier for isolation
         """
         self.workspace_id = workspace_id
-        self.llm_provider = llm_provider or OllamaLLMProvider()
-        self.embed_provider = embed_provider or OllamaEmbeddingProvider()
+
+        # Use router to get providers if not explicitly provided
+        if llm_provider is None or embed_provider is None:
+            llm, embed = ProviderRouter.get_providers()
+            self.llm_provider = llm_provider or llm
+            self.embed_provider = embed_provider or embed
+        else:
+            self.llm_provider = llm_provider
+            self.embed_provider = embed_provider
+
+        # Initialize policy redactor for hybrid safety
+        self.policy = PolicyRedactor()
 
         # Initialize vector store path for this workspace
         self.chroma_path = f"{Config.CHROMA_DB_PATH}/{workspace_id}"
@@ -162,16 +173,19 @@ class RAGPipeline:
         # Retrieve relevant documents
         docs = retriever.get_relevant_documents(request.question)
 
-        # Build citations
+        # Build citations with FULL excerpts (pre-redaction)
         citations = []
         for i, doc in enumerate(docs):
             citations.append(Citation(
                 source=doc.metadata.get('source', 'unknown'),
                 page=doc.metadata.get('page'),
-                excerpt=doc.page_content[:200],  # First 200 chars
+                excerpt=doc.page_content,  # FULL content for redaction
                 relevance_score=1.0 / (i + 1),  # Simple relevance
                 content_hash=hashlib.md5(doc.page_content.encode()).hexdigest()
             ))
+
+        # Apply policy redaction to get safe snippets
+        safe_context, excerpt_hashes = self.policy.redact_snippets(citations)
 
         # Build prompt
         template = """
@@ -187,11 +201,18 @@ class RAGPipeline:
         """
         prompt = ChatPromptTemplate.from_template(template)
 
-        # Generate answer
-        context_str = "\n\n".join([doc.page_content for doc in docs])
-        formatted_prompt = prompt.format(context=context_str, question=request.question)
+        # Generate answer with SAFE context (not full docs)
+        formatted_prompt = prompt.format(context=safe_context, question=request.question)
+
+        # Validate outbound payload (safety check)
+        if not self.policy.validate_outbound_payload(formatted_prompt):
+            raise ValueError("Policy violation: Outbound payload failed safety check")
 
         answer = self.llm_provider.generate(formatted_prompt)
+
+        # Truncate citation excerpts to first 200 chars for response
+        for citation in citations:
+            citation.excerpt = citation.excerpt[:200]
 
         latency = (time.time() - start_time) * 1000
 
